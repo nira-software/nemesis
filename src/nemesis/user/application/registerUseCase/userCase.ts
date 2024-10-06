@@ -1,8 +1,8 @@
 import { User } from "@/nemesis/user/domain/user";
 import { IUserRepository } from "@/nemesis/user/domain/i-user-repository";
 import { IBcryptAdapter } from "@/nemesis/user/domain/i-bcrypt-adapter";
-import { UserNewRequest } from "@/nemesis/user/application/dto/userNewRequest";
-import { UseNewResponse } from "@/nemesis/user/application/dto/useNewResponse";
+import { UserNewRequest } from "@/nemesis/user/application/registerUseCase/dto/userNewRequest";
+import { UseNewResponse } from "@/nemesis/user/application/registerUseCase/dto/useNewResponse";
 
 
 /**

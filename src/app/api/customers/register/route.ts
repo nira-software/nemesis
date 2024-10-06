@@ -1,7 +1,7 @@
-import { RegisterCustomer } from "@/nemesis/customers/application/useCases/RegisterCustomer";
+import { RegisterCustomer } from "@/nemesis/customers/application/registerUseCase/RegisterCustomer";
 import { NextResponse } from "next/server";
 import { PrismaCustomerRepository } from "@/nemesis/customers/infrastructure/repositories/PrismaCustomerRepository";
-import { CustomerNewRequest } from "@/nemesis/customers/application/useCases/dtos/customerNewRequest";
+import { CustomerNewRequest } from "@/nemesis/customers/application/registerUseCase/dtos/customerNewRequest";
 
 const customerRepository = new PrismaCustomerRepository()
 const useCase = new RegisterCustomer(customerRepository);

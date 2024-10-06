@@ -1,8 +1,8 @@
 
 import { Customer, CustomerStatus } from "@/nemesis/customers/domain/customer";
 import { ICustomerRepository } from "@/nemesis/customers/domain/i-customer-repository";
-import { CustomerNewRequest } from "@/nemesis/customers/application/useCases/dtos/customerNewRequest";
-import { CustomerNewResponse } from "@/nemesis/customers/application/useCases/dtos/customerNewResponse";
+import { CustomerNewRequest } from "@/nemesis/customers/application/registerUseCase/dtos/customerNewRequest";
+import { CustomerNewResponse } from "@/nemesis/customers/application/registerUseCase/dtos/customerNewResponse";
 
 export class RegisterCustomer {
 

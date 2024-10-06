@@ -1,9 +1,9 @@
 
 import { IUserRepository } from '@/nemesis/user/domain/i-user-repository';
 import { IBcryptAdapter } from '@/nemesis/user/domain/i-bcrypt-adapter';
-import { UserNewRequest } from '@/nemesis/user/application/dto/userNewRequest';
+import { UserNewRequest } from '@/nemesis/user/application/registerUseCase/dto/userNewRequest';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
-import { UserCase } from "@/nemesis/user/application/userCase";
+import { UserCase } from "@/nemesis/user/application/registerUseCase/userCase";
 
 describe('UserCase', () => {
   let userCase: UserCase;
