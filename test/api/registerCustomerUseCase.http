@@ -1,0 +1,14 @@
+POST http://localhost:3000/api/customers/register
+Content-Type: application/json
+
+{
+  "documentType": "DUI",
+  "documentNumber": "00000000-0",
+  "name": "John Doe",
+  "phone": "12345678",
+  "email": "john@example.com",
+  "activityCode": "56101",
+  "activityDescription": "Restaurant Services",
+  "status": "ACTIVE",
+  "notes": "First customer registration"
+}

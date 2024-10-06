@@ -48,8 +48,6 @@ model Role {
   @@schema("public")
 }
 
-// Schema para la gestion de clientes.
-// Customer (Modelo de CRM)
 /// Customer (Cliente en el CRM)
 model Customer {
   id                  String                  @id @default(uuid())
