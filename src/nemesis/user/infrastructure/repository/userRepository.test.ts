@@ -1,6 +1,6 @@
 import { prismaMock } from "@/__test__/singleton";
-import { UserRepository } from "@/nemesis/user/infrastructure/repository/userRepository";
 import { User } from "@/nemesis/user/domain/user";
+import { UserRepository } from "@/nemesis/user/infrastructure/repository/userRepository";
 
 
 test("save user", async () => {

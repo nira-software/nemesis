@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { ICustomerRepository } from "@/nemesis/customers/domain/i-customer-repository";
 import { Customer } from "@/nemesis/customers/domain/customer";
+import { ICustomerRepository } from "@/nemesis/customers/domain/i-customer-repository";
 
 export class PrismaCustomerRepository implements ICustomerRepository {
   private prisma = new PrismaClient();
