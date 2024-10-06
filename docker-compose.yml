@@ -19,5 +19,5 @@ networks:
     name: nemesis-docker_default
 volumes:
   db:
-    external:
-      name: nemesis-app-db
+    external: true
+    name: nemesis-app-db

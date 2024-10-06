@@ -1,34 +1,259 @@
 // prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql" // Asegúrate de usar el proveedor correcto (PostgreSQL, MySQL, SQLite, etc.)
   url      = env("DATABASE_URL")
+  schemas  = ["public", "invoices", "crm"] // Lista de esquemas
 }
 
 model User {
-  id           String @id @default(uuid()) // UUID como clave primaria
-  fullName     String @map("full_name") // Nombre personalizado de la columna en la DB
-  username     String @unique // Debe ser único
-  passwordHash String @map("password_hash") // Nombre personalizado de la columna en la DB
+  /// ID único generado automáticamente
+  id           String @id @default(uuid())
+  /// Nombre completo del usuario
+  fullName     String @map("full_name")
+  /// Nombre de usuario único
+  username     String @unique
+  /// Password hasheado
+  passwordHash String @map("password_hash")
+  /// Salt para hashear la contraseña
   salt         String
-  roleId       Int    @map("role_id") // Relación con Role
+  /// ID del rol
+  roleId       Int    @map("role_id")
+  /// Rol del usuario
   role         Role   @relation(fields: [roleId], references: [id])
 
+  /// Fecha de creación
   createdAt DateTime @default(now())
+  /// Fecha de actualización
   updatedAt DateTime @updatedAt
 
-  @@map("users") // Nombre personalizado de la tabla en la DB
+  @@map("users")
+  @@schema("public")
 }
 
 model Role {
-  id   Int    @id @default(autoincrement()) // ID auto incrementado
-  name String @unique // Nombre del rol único
+  /// ID único generado automáticamente
+  id    Int    @id @default(autoincrement())
+  /// Nombre del rol
+  name  String @unique
+  /// Usuarios con este rol
+  users User[]
 
-  users User[] // Relación uno a muchos con User
+  @@map("roles")
+  @@schema("public")
+}
 
-  @@map("roles") // Nombre personalizado de la tabla en la DB
+// Schema para la gestion de clientes.
+// Customer (Modelo de CRM)
+/// Customer (Cliente en el CRM)
+model Customer {
+  id                  String                  @id @default(uuid())
+  /// Tipo de documento (DUI, NIT, etc.)
+  documentType        String                  @map("document_type")
+  /// Número de documento
+  documentNumber      String                  @unique @map("document_number")
+  /// Nombre completo o razón social
+  name                String
+  /// Nombre comercial
+  tradeName           String?                 @map("trade_name")
+  /// Teléfono
+  phone               String?
+  /// Correo electrónico
+  email               String? // correo
+  /// Código de actividad económica
+  activityCode        String?                 @map("activity_code")
+  /// Descripción de la actividad económica
+  activityDescription String?                 @map("activity_description")
+  /// Fecha de registro en el CRM
+  registrationDate    DateTime                @default(now()) @map("registration_date")
+  /// Estado del cliente ( ACTIVO, INACTIVO, etc.)
+  status              CustomerStatus          @default(ACTIVE)
+  /// Direcciones del cliente
+  addresses           Address[]
+  /// Historial de contactos con el cliente
+  contactHistory      ContactHistory[]
+  /// Notas adicionales
+  notes               String?
+  /// Documentos tributarios electrónicos generados para el cliente
+  invoices            ElectronicTaxDocument[]
+
+  @@map("customers")
+  @@schema("crm")
+}
+
+/// Address (Dirección del cliente en el CRM)
+model Address {
+  /// ID único generado automáticamente
+  id           String   @id @default(uuid())
+  /// Cliente al que pertenece la dirección
+  customer     Customer @relation(fields: [customerId], references: [id])
+  //// ID del cliente
+  customerId   String   @map("customer_id")
+  /// Departamento
+  department   String
+  /// Municipio
+  municipality String
+  /// Dirección completa
+  complement   String? // Complemento
+
+  @@map("addresses")
+  @@schema("crm")
+}
+
+/// Historial de Contacto con el cliente
+model ContactHistory {
+  /// ID único generado automáticamente
+  id            String   @id @default(uuid())
+  /// Cliente al que pertenece el contacto
+  customer      Customer @relation(fields: [customerId], references: [id])
+  /// ID del cliente
+  customerId    String   @map("customer_id")
+  /// Fecha del contacto
+  contactDate   DateTime @default(now()) @map("contact_date")
+  /// Método de contacto (teléfono, email, reunión, etc.)
+  contactMethod String   @map("contact_method")
+  /// Descripción del contacto
+  description   String
+
+  @@map("contact_history")
+  @@schema("crm")
+}
+
+// Enum para el estado del cliente
+enum CustomerStatus {
+  /// Cliente activo
+  ACTIVE
+  /// Cliente inactivo
+  INACTIVE
+  /// Cliente prospecto (aún no ha realizado una compra)
+  PROSPECT
+
+  @@schema("crm")
+}
+
+// Schema de facturación electrónica
+
+/// InvoiceIssuer (Emisor - empresa que emite la factura)
+model InvoiceIssuer {
+  /// ID único generado automáticamente
+  id                  String                  @id @default(uuid())
+  /// NIT (Número de Identificación Tributaria)
+  nit                 String                  @unique
+  /// NRC (Número de Registro de Contribuyente)
+  nrc                 String?
+  /// Nombre completo o razón social
+  name                String
+  /// Nombre comercial
+  tradeName           String?                 @map("trade_name")
+  /// Código de actividad económica
+  activityCode        String?                 @map("activity_code")
+  /// Descripción de la actividad económica
+  activityDescription String?                 @map("activity_description")
+  /// Tipo de establecimiento
+  establishmentType   String?                 @map("establishment_type")
+  /// Teléfono
+  phone               String?
+  /// Correo electrónico
+  email               String?
+  /// Codigo del departamento
+  department          String
+  /// Codigo del municipio
+  municipality        String
+  /// Dirección
+  complementAddress   String?                 @map("complement_address")
+  /// Documentos tributarios electrónicos generados
+  invoices            ElectronicTaxDocument[]
+
+  @@map("invoice_issuers")
+  @@schema("invoices")
+}
+
+/// InvoiceReceiver (Receptor - Cliente)
+model InvoiceReceiver {
+  id             String                  @id @default(uuid())
+  /// Tipo de documento tributario electrónico
+  documentType   String                  @map("document_type")
+  /// Número de documento ( DUI, NIT, etc.)
+  documentNumber String                  @unique @map("document_number")
+  /// Nombre completo o razón social
+  name           String
+  /// Teléfono
+  phone          String?
+  /// Correo electrónico
+  email          String?
+  /// Documentos tributarios electrónicos generados
+  invoices       ElectronicTaxDocument[]
+
+  @@map("invoice_receivers")
+  @@schema("invoices")
+}
+
+/// Documentos Tributarios Electrónicos
+model ElectronicTaxDocument {
+  /// ID único generado automáticamente
+  id                String          @id @default(uuid())
+  /// Numero de Control asignado por la DGI
+  controlNumber     String          @map("control_number")
+  /// Código de Generación de la Factura
+  generationCode    String          @unique @default(uuid())
+  /// Fecha de emision de la factura
+  issueDate         DateTime        @default(now())
+  /// Tipo de moneda
+  typeOfCurrency    String          @map("type_of_currency")
+  /// Monto total gravado
+  totalTaxed        Float           @map("total_taxed")
+  /// Monto total exento
+  totalExempt       Float?          @map("total_exempt")
+  /// Monto total de la factura
+  totalToPay        Float           @map("total_to_pay")
+  /// Monto total del IVA
+  totalTax          Float           @map("total_tax")
+  /// Emisor de la DTE
+  invoiceIssuer     InvoiceIssuer   @relation(fields: [invoiceIssuerId], references: [id])
+  /// ID del emisor
+  invoiceIssuerId   String          @map("invoice_issuer_id")
+  /// Receptor de la DTE
+  invoiceReceiver   InvoiceReceiver @relation(fields: [invoiceReceiverId], references: [id])
+  /// ID del receptor
+  invoiceReceiverId String          @map("invoice_receiver_id")
+  /// Detalles de la DTE
+  items             InvoiceItem[]
+  /// Cliente al que le pertenece el documento segun el CRM
+  Customer          Customer        @relation(fields: [customerId], references: [id])
+  /// ID del cliente
+  customerId        String          @map("customer_id")
+
+  @@map("electronic_tax_documents")
+  @@schema("invoices")
+}
+
+/// InvoiceItem (ItemFactura - detalle de cada artículo en la factura)
+model InvoiceItem {
+  id          Int                   @id @default(autoincrement())
+  /// Número de item
+  itemNumber  Int                   @map("item_number")
+  /// Tipo de item
+  itemType    Int                   @map("item_type")
+  /// Descripción
+  description String
+  /// Cantidad
+  quantity    Float
+  /// Precio unitario
+  unitPrice   Float                 @map("unit_price")
+  /// Precio total con impuestos
+  taxedSale   Float                 @map("taxed_sale")
+  /// Precio total exento
+  itemTax     Float                 @map("item_tax")
+  /// Documento Tributario Electrónico
+  invoice     ElectronicTaxDocument @relation(fields: [invoiceId], references: [id])
+  /// ID del documento tributario electrónico (DTE)
+  invoiceId   String                @map("invoice_id")
+
+  @@map("invoice_items")
+  @@schema("invoices")
 }
