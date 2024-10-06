@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:13
+    container_name: nemesis-db
+    environment:
+      POSTGRES_DB: nemesis
+      POSTGRES_USER: nemesis
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    volumes:
+      - db:/var/lib/postgresql/data
+
+networks:
+  default:
+    external: true
+    name: nemesis-docker_default
+volumes:
+  db:
+    external:
+      name: nemesis-app-db

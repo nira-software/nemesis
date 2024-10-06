@@ -1,3 +1,14 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "plugins": [
+    "hexagonal-architecture"
+  ],
+  "overrides": [
+    {
+      "files": ["src/nemesis/**/*.ts"],
+        "rules": {
+            "hexagonal-architecture/enforce": ["error"]
+        }
+    }
+  ]
 }

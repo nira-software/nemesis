@@ -1,0 +1,12 @@
+### Send request with dynamic variables in request's body
+POST http://localhost:3000/api/user
+Content-Type: application/json
+
+{
+  "fullName": "Administrador",
+  "username": "admin",
+  "password": "admin",
+  "role": "admin"
+}
+
+###
